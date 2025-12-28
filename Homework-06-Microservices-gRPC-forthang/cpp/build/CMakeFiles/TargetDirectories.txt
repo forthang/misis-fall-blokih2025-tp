@@ -1,0 +1,4 @@
+/home/forthang/work/unic/Homework-06-Microservices-gRPC-forthang/cpp/build/CMakeFiles/grpc_server.dir
+/home/forthang/work/unic/Homework-06-Microservices-gRPC-forthang/cpp/build/CMakeFiles/grpc_client.dir
+/home/forthang/work/unic/Homework-06-Microservices-gRPC-forthang/cpp/build/CMakeFiles/edit_cache.dir
+/home/forthang/work/unic/Homework-06-Microservices-gRPC-forthang/cpp/build/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,2 @@
+# Hashes of file build rules.
+a4dc969eda7c7512817f67fb41714647 generated/metrics.pb.cc

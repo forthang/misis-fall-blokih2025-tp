@@ -1,0 +1,41 @@
+
+syntax = "proto3";
+
+package lifeos;
+
+// Сервис для работы с жизненными показателями
+service VitalSignsService {
+    // Записать одно измерение
+    rpc RecordMetric (MetricRequest) returns (MetricResponse) {}
+
+    // Получить среднее значение по типу метрики
+    rpc GetAverage (AverageRequest) returns (AverageResponse) {}
+}
+
+enum MetricType {
+    UNKNOWN = 0;
+    HEART_RATE = 1; // Пульс
+    STRESS_LEVEL = 2; // Уровень стресса (0-100)
+}
+
+message MetricRequest {
+    string user_id = 1;
+    MetricType type = 2;
+    double value = 3;
+    int64 timestamp = 4; // Unix timestamp
+}
+
+message MetricResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message AverageRequest {
+    string user_id = 1;
+    MetricType type = 2;
+}
+
+message AverageResponse {
+    double average_value = 1;
+    int32 count = 2; // Количество измерений, по которым считали
+}

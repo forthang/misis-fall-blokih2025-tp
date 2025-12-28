@@ -1,0 +1,35 @@
+name: Autograding Tests
+on:
+  - pull_request
+
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - id: test_grpc
+        name: HW 06 - gRPC Service
+        uses: https://gitverse.ru/actions/autograding-command-grader@v2
+        with:
+          test-name: LifeOS-gRPC-Check
+          # 1. Устанавливаем системные либы (для C++) и Python-либы (для тестов и Python-трека)
+          setup-command: >
+            sudo apt-get update &&
+            sudo apt-get install -y protobuf-compiler grpc-compiler cmake build-essential libboost-all-dev libyaml-cpp-dev libev-dev libssl-dev libnghttp2-dev libjemalloc-dev python3-dev &&
+            pip install grpcio grpcio-tools protobuf pytest numpy
+
+          # 2. Запускаем универсальный скрипт проверки
+          command: python3 tests/grade.py
+
+          # 3. Даем время на компиляцию C++ (это может занять 5-10 минут)
+          timeout: 15
+          max-score: 10
+
+      - name: Autograding Reporter
+        uses: https://gitverse.ru/actions/autograding-grading-reporter@v2
+        env:
+          TEST_GRPC_RESULTS: ${{steps.test_grpc.outputs.result}}
+        with:
+          runners: test_grpc

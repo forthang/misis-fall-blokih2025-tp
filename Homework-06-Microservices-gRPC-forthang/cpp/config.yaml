@@ -1,0 +1,25 @@
+components_manager:
+  task_processors:
+    main-task-processor:
+      worker_threads: 4
+    fs-task-processor:
+      worker_threads: 2
+
+  default_task_processor: main-task-processor
+
+  components:
+    # Системные компоненты
+    logging:
+      fs-task-processor: fs-task-processor
+      loggers:
+        default:
+          file_path: "@stderr"
+          level: debug
+          overflow_behavior: discard
+
+    # Компонент, отвечающий за gRPC сервер
+    grpc-server:
+      port: 50051
+
+    # Наш компонент
+    vital-signs-service:

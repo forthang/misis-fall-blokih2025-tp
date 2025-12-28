@@ -1,0 +1,64 @@
+cmake_minimum_required(VERSION 3.16)
+project(lifeos_grpc_service)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Найти gRPC и Protobuf
+find_package(Protobuf REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GRPC REQUIRED grpc++)
+
+# Генерация кода из proto файла
+set(PROTO_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../proto")
+set(PROTO_FILE "${PROTO_PATH}/metrics.proto")
+set(GENERATED_PROTOBUF_PATH "${CMAKE_CURRENT_BINARY_DIR}/generated")
+
+file(MAKE_DIRECTORY ${GENERATED_PROTOBUF_PATH})
+
+# Генерируем C++ код из proto
+add_custom_command(
+    OUTPUT "${GENERATED_PROTOBUF_PATH}/metrics.pb.cc"
+           "${GENERATED_PROTOBUF_PATH}/metrics.pb.h"
+           "${GENERATED_PROTOBUF_PATH}/metrics.grpc.pb.cc"
+           "${GENERATED_PROTOBUF_PATH}/metrics.grpc.pb.h"
+    COMMAND protoc
+    ARGS --grpc_out=${GENERATED_PROTOBUF_PATH}
+         --cpp_out=${GENERATED_PROTOBUF_PATH}
+         --plugin=protoc-gen-grpc=`which grpc_cpp_plugin`
+         -I${PROTO_PATH}
+         ${PROTO_FILE}
+    DEPENDS ${PROTO_FILE}
+    COMMENT "Generating gRPC code"
+)
+
+# Включаем директорию с сгенерированными файлами
+include_directories(${GENERATED_PROTOBUF_PATH})
+
+# Сервер
+add_executable(grpc_server
+    src/simple_server.cpp
+    ${GENERATED_PROTOBUF_PATH}/metrics.pb.cc
+    ${GENERATED_PROTOBUF_PATH}/metrics.grpc.pb.cc
+)
+
+target_link_libraries(grpc_server
+    ${GRPC_LIBRARIES}
+    ${Protobuf_LIBRARIES}
+)
+
+target_include_directories(grpc_server PRIVATE ${GRPC_INCLUDE_DIRS})
+
+# Клиент
+add_executable(grpc_client
+    src/client.cpp
+    ${GENERATED_PROTOBUF_PATH}/metrics.pb.cc
+    ${GENERATED_PROTOBUF_PATH}/metrics.grpc.pb.cc
+)
+
+target_link_libraries(grpc_client
+    ${GRPC_LIBRARIES}
+    ${Protobuf_LIBRARIES}
+)
+
+target_include_directories(grpc_client PRIVATE ${GRPC_INCLUDE_DIRS})
